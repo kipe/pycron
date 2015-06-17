@@ -2,5 +2,6 @@ bin
 include
 lib
 local
+man
 
 *.pyc
