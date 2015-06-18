@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-def _parse_arg(value, target, maximum):
+def _parse_arg(value, target):
     if value == '*':
         return True
 
@@ -18,11 +18,6 @@ def _parse_arg(value, target, maximum):
         value, interval = value.split('/')
         if value != '*':
             raise ValueError
-
-        interval = int(interval)
-        if interval not in range(0, maximum + 1):
-            raise ValueError
-
         return target % int(interval) == 0
 
     if int(value) == target:
@@ -40,8 +35,8 @@ def is_now(s):
     now = datetime.now()
     minute, hour, dom, month, dow = s.split(' ')
 
-    return _parse_arg(minute, now.minute, 30) \
-        and _parse_arg(hour, now.hour, 12) \
-        and _parse_arg(dom, now.day, 14) \
-        and _parse_arg(month, now.month, 6) \
-        and _parse_arg(dow, now.weekday(), 3)
+    return _parse_arg(minute, now.minute) \
+        and _parse_arg(hour, now.hour) \
+        and _parse_arg(dom, now.day) \
+        and _parse_arg(month, now.month) \
+        and _parse_arg(dow, now.weekday())
