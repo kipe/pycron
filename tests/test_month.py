@@ -1,5 +1,6 @@
 from datetime import datetime
 import mock
+import pycron
 
 
 def test_parser():
@@ -11,3 +12,4 @@ def test_parser():
     assert mock.is_now(now, '* * * 5 *') is False
     assert mock.is_now(now, '* * * */5 *') is False
     assert mock.is_now(now, '* * * 1,4,12 *') is False
+    assert pycron.MONTH_CHOICES[now.month][1] == 'June'

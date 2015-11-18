@@ -2,27 +2,27 @@ from datetime import datetime
 import calendar
 
 
-# Choice generators, mainly designed to use with Django
-MINUTE_CHOICES = (
-    ['*'] + [str(x) for x in range(0, 60)],
-    ['every minute'] + [str(x) for x in range(0, 60)]
-)
-HOUR_CHOICES = (
-    ['*'] + [str(x) for x in range(0, 24)],
-    ['every hour'] + [str(x) for x in range(0, 24)]
-)
-DOM_CHOICES = (
-    ['*'] + [str(x) for x in range(1, 32)],
-    ['every day of month'] + [str(x) for x in range(1, 32)]
-)
-MONTH_CHOICES = (
-    ['*'] + [str(x) for x in range(1, 13)],
-    ['every month'] + list(calendar.month_name)
-)
-DOW_CHOICES = (
-    ['*'] + [str(x) for x in range(1, 8)],
-    ['every day of week'] + list(calendar.day_name)
-)
+# Choice tuples, mainly designed to use with Django
+MINUTE_CHOICES = [
+    (x, str(x) if x != '*' else 'every minute')
+    for x in ['*'] + range(0, 60)
+]
+HOUR_CHOICES = [
+    (x, str(x) if x != '*' else 'every hour')
+    for x in ['*'] + range(0, 24)
+]
+DOM_CHOICES = [
+    (x, str(x) if x != '*' else 'every day of the month')
+    for x in ['*'] + range(1, 32)
+]
+MONTH_CHOICES = [
+    (x, calendar.month_name[x] if x != '*' else 'every month')
+    for x in ['*'] + range(1, 13)
+]
+DOW_CHOICES = [
+    (x, calendar.day_name[x] if x != '*' else 'every day of the week')
+    for x in ['*'] + range(0, 7)
+]
 
 
 def _parse_arg(value, target):
