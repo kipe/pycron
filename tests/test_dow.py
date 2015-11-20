@@ -12,5 +12,5 @@ def test_parser():
     assert mock.is_now(now, '* * * * 4') is False
     assert mock.is_now(now, '* * * * */2') is False
     assert mock.is_now(now, '* * * * 0,4,6') is False
-    assert pycron.DOW_CHOICES[now.isoweekday()][1] == 'Thursday'
-    assert pycron.DOW_CHOICES[7][1] == 'Sunday'
+    assert pycron.DOW_CHOICES[now.weekday()][1] == 'Thursday'
+    assert pycron.DOW_CHOICES[6][1] == 'Sunday'

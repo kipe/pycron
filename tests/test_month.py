@@ -12,4 +12,4 @@ def test_parser():
     assert mock.is_now(now, '* * * 5 *') is False
     assert mock.is_now(now, '* * * */5 *') is False
     assert mock.is_now(now, '* * * 1,4,12 *') is False
-    assert pycron.MONTH_CHOICES[now.month][1] == 'June'
+    assert pycron.MONTH_CHOICES[now.month - 1][1] == 'June'

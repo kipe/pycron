@@ -3,26 +3,11 @@ import calendar
 
 
 # Choice tuples, mainly designed to use with Django
-MINUTE_CHOICES = [
-    (x, str(x) if x != '*' else 'every minute')
-    for x in ['*'] + list(range(0, 60))
-]
-HOUR_CHOICES = [
-    (x, str(x) if x != '*' else 'every hour')
-    for x in ['*'] + list(range(0, 24))
-]
-DOM_CHOICES = [
-    (x, str(x) if x != '*' else 'every day of the month')
-    for x in ['*'] + list(range(1, 32))
-]
-MONTH_CHOICES = [
-    (x, calendar.month_name[x] if x != '*' else 'every month')
-    for x in ['*'] + list(range(1, 13))
-]
-DOW_CHOICES = [
-    (x, calendar.day_name[x] if x != '*' else 'every day of the week')
-    for x in ['*'] + list(range(0, 7))
-]
+MINUTE_CHOICES = [(str(x), str(x)) for x in range(0, 60)]
+HOUR_CHOICES = [(str(x), str(x)) for x in range(0, 24)]
+DOM_CHOICES = [(str(x), str(x)) for x in range(1, 32)]
+MONTH_CHOICES = [(str(x), calendar.month_name[x]) for x in range(1, 13)]
+DOW_CHOICES = [(str(x + 1), calendar.day_name[x]) for x in range(0, 7)]
 
 
 def _parse_arg(value, target):
