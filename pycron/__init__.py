@@ -5,23 +5,23 @@ import calendar
 # Choice tuples, mainly designed to use with Django
 MINUTE_CHOICES = [
     (x, str(x) if x != '*' else 'every minute')
-    for x in ['*'] + range(0, 60)
+    for x in ['*'] + list(range(0, 60))
 ]
 HOUR_CHOICES = [
     (x, str(x) if x != '*' else 'every hour')
-    for x in ['*'] + range(0, 24)
+    for x in ['*'] + list(range(0, 24))
 ]
 DOM_CHOICES = [
     (x, str(x) if x != '*' else 'every day of the month')
-    for x in ['*'] + range(1, 32)
+    for x in ['*'] + list(range(1, 32))
 ]
 MONTH_CHOICES = [
     (x, calendar.month_name[x] if x != '*' else 'every month')
-    for x in ['*'] + range(1, 13)
+    for x in ['*'] + list(range(1, 13))
 ]
 DOW_CHOICES = [
     (x, calendar.day_name[x] if x != '*' else 'every day of the week')
-    for x in ['*'] + range(0, 7)
+    for x in ['*'] + list(range(0, 7))
 ]
 
 
