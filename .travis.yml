@@ -9,3 +9,4 @@ install:
   - pip install -e .
 script:
   - nosetests
+sudo: false
