@@ -11,26 +11,38 @@ DOW_CHOICES = [(str(x + 1), calendar.day_name[x]) for x in range(0, 7)]
 
 
 def _parse_arg(value, target):
+    value = value.strip()
+
     if value == '*':
         return True
 
-    if ',' in value:
-        if '*' in value:
-            raise ValueError
+    values = filter(None, [x.strip() for x in value.split(',')])
 
-        values = filter(None, [int(x.strip()) for x in value.split(',')])
-        if target in values:
-            return True
-        return False
+    for value in values:
+        try:
+            # First, try a direct comparison
+            if int(value) == target:
+                return True
+        except ValueError:
+            pass
 
-    if '/' in value:
-        value, interval = value.split('/')
-        if value != '*':
-            raise ValueError
-        return target % int(interval) == 0
+        if '/' in value:
+            v, interval = [x.strip() for x in value.split('/')]
+            # Not sure if applicable for every situation, but just to make sure...
+            if v != '*':
+                continue
+            # If the remainder is zero, this matches
+            if target % int(interval) == 0:
+                return True
 
-    if int(value) == target:
-        return True
+        if '-' in value:
+            try:
+                start, end = [int(x.strip()) for x in value.split('-')]
+            except ValueError:
+                continue
+            # If target value is in the range, it matches
+            if target in range(start, end + 1):
+                return True
 
     return False
 

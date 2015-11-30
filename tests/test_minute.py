@@ -15,3 +15,10 @@ def test_parser():
     assert mock.is_now(now, '*/5 * * * *') is False
     assert mock.is_now(now, '*/12 * * * *') is False
     assert mock.is_now(now, '3,25,16 * * * *') is False
+    assert mock.is_now(now, '0-10 * * * *')
+    assert mock.is_now(now, '0-10 0-10 * * *')
+    assert mock.is_now(now, '10-20 * * * *') is False
+    assert mock.is_now(now, '10-20 10-20 * * *') is False
+    assert mock.is_now(now, '1,2,5-10 * * * *')
+    assert mock.is_now(now, '9,5-8 * * * *')
+    assert mock.is_now(now, '10,20-30 * * * *') is False
