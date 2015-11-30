@@ -7,7 +7,7 @@ MINUTE_CHOICES = [(str(x), str(x)) for x in range(0, 60)]
 HOUR_CHOICES = [(str(x), str(x)) for x in range(0, 24)]
 DOM_CHOICES = [(str(x), str(x)) for x in range(1, 32)]
 MONTH_CHOICES = [(str(x), calendar.month_name[x]) for x in range(1, 13)]
-DOW_CHOICES = [(str(x + 1), calendar.day_name[x]) for x in range(0, 7)]
+DOW_CHOICES = [('0', calendar.day_name[6])] + [(str(x + 1), calendar.day_name[x]) for x in range(0, 6)]
 
 
 def _parse_arg(value, target):
