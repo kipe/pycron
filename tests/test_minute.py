@@ -1,24 +1,24 @@
 from datetime import datetime
-import mock
+import pycron
 
 
 def test_parser():
     now = datetime(2015, 6, 18, 0, 9)
-    assert mock.is_now(now, '* * * * *')
-    assert mock.is_now(now, '9 * * * *')
-    assert mock.is_now(now, '*/1 * * * *')
-    assert mock.is_now(now, '*/3 * * * *')
-    assert mock.is_now(now, '*/9 * * * *')
-    assert mock.is_now(now, '3,9,25,16 * * * *')
-    assert mock.is_now(now, '*/2 * * * *') is False
-    assert mock.is_now(now, '*/4 * * * *') is False
-    assert mock.is_now(now, '*/5 * * * *') is False
-    assert mock.is_now(now, '*/12 * * * *') is False
-    assert mock.is_now(now, '3,25,16 * * * *') is False
-    assert mock.is_now(now, '0-10 * * * *')
-    assert mock.is_now(now, '0-10 0-10 * * *')
-    assert mock.is_now(now, '10-20 * * * *') is False
-    assert mock.is_now(now, '10-20 10-20 * * *') is False
-    assert mock.is_now(now, '1,2,5-10 * * * *')
-    assert mock.is_now(now, '9,5-8 * * * *')
-    assert mock.is_now(now, '10,20-30 * * * *') is False
+    assert pycron.is_now('* * * * *', now)
+    assert pycron.is_now('9 * * * *', now)
+    assert pycron.is_now('*/1 * * * *', now)
+    assert pycron.is_now('*/3 * * * *', now)
+    assert pycron.is_now('*/9 * * * *', now)
+    assert pycron.is_now('3,9,25,16 * * * *', now)
+    assert pycron.is_now('*/2 * * * *', now) is False
+    assert pycron.is_now('*/4 * * * *', now) is False
+    assert pycron.is_now('*/5 * * * *', now) is False
+    assert pycron.is_now('*/12 * * * *', now) is False
+    assert pycron.is_now('3,25,16 * * * *', now) is False
+    assert pycron.is_now('0-10 * * * *', now)
+    assert pycron.is_now('0-10 0-10 * * *', now)
+    assert pycron.is_now('10-20 * * * *', now) is False
+    assert pycron.is_now('10-20 10-20 * * *', now) is False
+    assert pycron.is_now('1,2,5-10 * * * *', now)
+    assert pycron.is_now('9,5-8 * * * *', now)
+    assert pycron.is_now('10,20-30 * * * *', now) is False
