@@ -18,7 +18,7 @@ def _parse_arg(value, target):
         if '*' in value:
             raise ValueError
 
-        values = filter(None, [int(x.strip()) for x in value.split(',')])
+        values = [int(x.strip()) for x in value.split(',')]
         if target in values:
             return True
         return False
