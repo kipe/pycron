@@ -1,6 +1,9 @@
 # pycron [![Build Status](https://travis-ci.org/kipe/pycron.svg?branch=master)](https://travis-ci.org/kipe/pycron)
 Simple cron-like parser, which determines if current datetime matches conditions
 
+## Installation
+`pip install pycron`
+
 ## Usage
 ```python
 import pycron
