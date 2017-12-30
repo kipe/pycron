@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from nose.tools import assert_raises
 from pytz import utc
 import pycron
+import pendulum
 
 
 def test_minutes():
@@ -17,6 +18,7 @@ def test_minutes():
     now = datetime(2015, 6, 18, 0, 3)
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
+    run(pendulum.instance(since), pendulum.instance(now))
 
 
 def test_hours():
@@ -32,6 +34,7 @@ def test_hours():
     now = datetime(2015, 6, 18, 3, 0)
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
+    run(pendulum.instance(since), pendulum.instance(now))
 
 
 def test_days():
@@ -47,12 +50,14 @@ def test_days():
     now = datetime(2015, 6, 3, 0, 0)
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
+    run(pendulum.instance(since), pendulum.instance(now))
 
 
 def test_raises():
     since = datetime(2016, 6, 1, 0, 0)
     now = datetime(2015, 6, 3, 0, 0)
     assert_raises(ValueError, pycron.has_been, '* * * * *', since, now)
+    assert_raises(ValueError, pycron.has_been, '* * * * *', pendulum.instance(since), pendulum.instance(now))
 
 
 def test_timezone():

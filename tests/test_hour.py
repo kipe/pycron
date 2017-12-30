@@ -1,6 +1,7 @@
 from datetime import datetime
 import pycron
 from pytz import utc
+import pendulum
 
 
 def test_hour():
@@ -23,3 +24,4 @@ def test_hour():
     now = datetime(2015, 6, 18, 16, 7)
     run(now)
     run(now.replace(tzinfo=utc))
+    run(pendulum.instance(now))
