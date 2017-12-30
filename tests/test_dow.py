@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import pycron
+from pytz import utc
 
 
 def test_dow():
@@ -16,7 +17,9 @@ def test_dow():
         assert pycron.is_now('* * * * 0-4', now)
         assert pycron.is_now('* * * * 5-6', now) is False
 
-    run(datetime(2015, 6, 18, 16, 7))
+    now = datetime(2015, 6, 18, 16, 7)
+    run(now)
+    run(now.replace(tzinfo=utc))
 
 
 def test_day_matching():
@@ -32,4 +35,6 @@ def test_day_matching():
             # Test weekends
             assert pycron.is_now('* * * * 0,6', now) is (True if i in [0, 6] else False)
 
-    run(datetime(2015, 6, 20, 16, 7))
+    now = datetime(2015, 6, 20, 16, 7)
+    run(now)
+    run(now.replace(tzinfo=utc))

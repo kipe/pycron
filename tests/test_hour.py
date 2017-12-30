@@ -1,5 +1,6 @@
 from datetime import datetime
 import pycron
+from pytz import utc
 
 
 def test_hour():
@@ -19,4 +20,6 @@ def test_hour():
         assert pycron.is_now('* 16-20 * * *', now)
         assert pycron.is_now('* 0-10 * * *', now) is False
 
-    run(datetime(2015, 6, 18, 16, 7))
+    now = datetime(2015, 6, 18, 16, 7)
+    run(now)
+    run(now.replace(tzinfo=utc))
