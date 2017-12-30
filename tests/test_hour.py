@@ -4,6 +4,7 @@ from pytz import utc
 import pendulum
 import arrow
 import udatetime
+from delorean import Delorean
 
 
 def test_hour():
@@ -29,3 +30,4 @@ def test_hour():
     run(pendulum.instance(now))
     run(arrow.get(now))
     run(udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=now, timezone='UTC').datetime)

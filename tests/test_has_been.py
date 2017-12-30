@@ -5,6 +5,7 @@ import pycron
 import pendulum
 import arrow
 import udatetime
+from delorean import Delorean
 
 
 def test_minutes():
@@ -23,6 +24,7 @@ def test_minutes():
     run(pendulum.instance(since), pendulum.instance(now))
     run(arrow.get(since), arrow.get(now))
     run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_hours():
@@ -41,6 +43,7 @@ def test_hours():
     run(pendulum.instance(since), pendulum.instance(now))
     run(arrow.get(since), arrow.get(now))
     run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_days():
@@ -59,6 +62,7 @@ def test_days():
     run(pendulum.instance(since), pendulum.instance(now))
     run(arrow.get(since), arrow.get(now))
     run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_raises():
@@ -68,6 +72,7 @@ def test_raises():
     assert_raises(ValueError, pycron.has_been, '* * * * *', pendulum.instance(since), pendulum.instance(now))
     assert_raises(ValueError, pycron.has_been, '* * * * *', arrow.get(since), arrow.get(now))
     assert_raises(ValueError, pycron.has_been, '* * * * *', udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    assert_raises(ValueError, pycron.has_been, '* * * * *', Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_timezone():
