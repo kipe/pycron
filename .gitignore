@@ -3,6 +3,7 @@ include
 lib
 local
 man
+venv
 
 *.pyc
 dist

@@ -1,5 +1,5 @@
 # pycron [![Build Status](https://travis-ci.org/kipe/pycron.svg?branch=master)](https://travis-ci.org/kipe/pycron)
-Simple cron-like parser for Python, which determines if current datetime matches conditions
+Simple cron-like parser for Python, which determines if current datetime matches conditions.
 
 ## Installation
 `pip install pycron`
@@ -23,10 +23,12 @@ The module includes `is_now(s, dt=None)`, where `s` is the cron-style string
 and `dt` is the datetime to use (defaults to current datetime, if not set).
 The function returns `True`, if `dt` matches the format.
 
-It also includes `has_been(s, since, dt=None)`, where `s` is the cron-style string, 
+It also includes `has_been(s, since, dt=None)`, where `s` is the cron-style string,
 `since` is a datetime in the past and `dt` is the datetime to use (defaults to current datetime, if not set).
-The function returns `True`, if `dt` would have matched the format at some point during the period. 
+The function returns `True`, if `dt` would have matched the format at some point during the period.
 This behaves much like like [anacron](https://en.wikipedia.org/wiki/Anacron) and is useful for applications which do not run continuously.
+
+All functions are compatible with both timezone aware and naive datetimes.
 
 There are couple of helpers available, mainly for use with Django.
 They give out list of tuples, as required by Django field choices.

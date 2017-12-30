@@ -5,39 +5,48 @@ import pycron
 
 
 def test_minutes():
+    def run(since, now):
+        assert pycron.has_been('* * * * *', since, now)
+        assert pycron.has_been('0 * * * *', since, now) is False
+        assert pycron.has_been('1 * * * *', since, now)
+        assert pycron.has_been('2 * * * *', since, now)
+        assert pycron.has_been('3 * * * *', since, now)
+        assert pycron.has_been('4 * * * *', since, now) is False
+
     since = datetime(2015, 6, 18, 0, 1)
     now = datetime(2015, 6, 18, 0, 3)
-
-    assert pycron.has_been('* * * * *', since, now)
-    assert pycron.has_been('0 * * * *', since, now) is False
-    assert pycron.has_been('1 * * * *', since, now)
-    assert pycron.has_been('2 * * * *', since, now)
-    assert pycron.has_been('3 * * * *', since, now)
-    assert pycron.has_been('4 * * * *', since, now) is False
+    run(since, now)
+    run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
 
 
 def test_hours():
+    def run(since, now):
+        assert pycron.has_been('* * * * *', since, now)
+        assert pycron.has_been('* 0 * * *', since, now) is False
+        assert pycron.has_been('* 1 * * *', since, now)
+        assert pycron.has_been('* 2 * * *', since, now)
+        assert pycron.has_been('* 3 * * *', since, now)
+        assert pycron.has_been('* 4 * * *', since, now) is False
+
     since = datetime(2015, 6, 18, 1, 0)
     now = datetime(2015, 6, 18, 3, 0)
-
-    assert pycron.has_been('* * * * *', since, now)
-    assert pycron.has_been('* 0 * * *', since, now) is False
-    assert pycron.has_been('* 1 * * *', since, now)
-    assert pycron.has_been('* 2 * * *', since, now)
-    assert pycron.has_been('* 3 * * *', since, now)
-    assert pycron.has_been('* 4 * * *', since, now) is False
+    run(since, now)
+    run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
 
 
 def test_days():
+    def run(since, now):
+        assert pycron.has_been('* * * * *', since, now)
+        assert pycron.has_been('* * 0 * *', since, now) is False
+        assert pycron.has_been('* * 1 * *', since, now)
+        assert pycron.has_been('* * 2 * *', since, now)
+        assert pycron.has_been('* * 3 * *', since, now)
+        assert pycron.has_been('* * 4 * *', since, now) is False
+
     since = datetime(2015, 6, 1, 0, 0)
     now = datetime(2015, 6, 3, 0, 0)
-
-    assert pycron.has_been('* * * * *', since, now)
-    assert pycron.has_been('* * 0 * *', since, now) is False
-    assert pycron.has_been('* * 1 * *', since, now)
-    assert pycron.has_been('* * 2 * *', since, now)
-    assert pycron.has_been('* * 3 * *', since, now)
-    assert pycron.has_been('* * 4 * *', since, now) is False
+    run(since, now)
+    run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
 
 
 def test_raises():
