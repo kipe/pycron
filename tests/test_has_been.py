@@ -13,7 +13,10 @@ def test_minutes():
         assert pycron.has_been('3 * * * *', since, now)
         assert pycron.has_been('4 * * * *', since, now) is False
 
-    run(datetime(2015, 6, 18, 0, 1), datetime(2015, 6, 18, 0, 3))
+    since = datetime(2015, 6, 18, 0, 1)
+    now = datetime(2015, 6, 18, 0, 3)
+    run(since, now)
+    run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
 
 
 def test_hours():
@@ -25,7 +28,10 @@ def test_hours():
         assert pycron.has_been('* 3 * * *', since, now)
         assert pycron.has_been('* 4 * * *', since, now) is False
 
-    run(datetime(2015, 6, 18, 1, 0), datetime(2015, 6, 18, 3, 0))
+    since = datetime(2015, 6, 18, 1, 0)
+    now = datetime(2015, 6, 18, 3, 0)
+    run(since, now)
+    run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
 
 
 def test_days():
@@ -37,7 +43,10 @@ def test_days():
         assert pycron.has_been('* * 3 * *', since, now)
         assert pycron.has_been('* * 4 * *', since, now) is False
 
-    run(datetime(2015, 6, 1, 0, 0), datetime(2015, 6, 3, 0, 0))
+    since = datetime(2015, 6, 1, 0, 0)
+    now = datetime(2015, 6, 3, 0, 0)
+    run(since, now)
+    run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
 
 
 def test_raises():
