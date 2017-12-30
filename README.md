@@ -44,6 +44,14 @@ The available helpers are
 - `pycron.DOW_CHOICES`, for day names
 
 
+## Support for alternative datetime -libraries
+Currently supported "alternative" datetime libraries are:
+- [Arrow](http://arrow.readthedocs.io/en/latest/)
+- [Delorean](http://delorean.readthedocs.io/en/latest/)
+- [Pendulum](https://pendulum.eustace.io/)
+- [udatetime](https://github.com/freach/udatetime)
+
+
 #### Notes
 This was done, as I personally needed something like this to implement proper timers for my Django-project and
 every available library felt too complicated for my use-case. Also, this was a good coding exercise...

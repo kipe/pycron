@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 import pycron
 from pytz import utc
+import pendulum
+import arrow
+import udatetime
+from delorean import Delorean
 
 
 def test_dow():
@@ -20,6 +24,10 @@ def test_dow():
     now = datetime(2015, 6, 18, 16, 7)
     run(now)
     run(now.replace(tzinfo=utc))
+    run(pendulum.instance(now))
+    run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_day_matching():
@@ -38,3 +46,7 @@ def test_day_matching():
     now = datetime(2015, 6, 20, 16, 7)
     run(now)
     run(now.replace(tzinfo=utc))
+    run(pendulum.instance(now))
+    run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=now, timezone='UTC').datetime)

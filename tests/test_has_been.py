@@ -2,6 +2,10 @@ from datetime import datetime, timedelta
 from nose.tools import assert_raises
 from pytz import utc
 import pycron
+import pendulum
+import arrow
+import udatetime
+from delorean import Delorean
 
 
 def test_minutes():
@@ -17,6 +21,10 @@ def test_minutes():
     now = datetime(2015, 6, 18, 0, 3)
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
+    run(pendulum.instance(since), pendulum.instance(now))
+    run(arrow.get(since), arrow.get(now))
+    run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_hours():
@@ -32,6 +40,10 @@ def test_hours():
     now = datetime(2015, 6, 18, 3, 0)
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
+    run(pendulum.instance(since), pendulum.instance(now))
+    run(arrow.get(since), arrow.get(now))
+    run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_days():
@@ -47,12 +59,20 @@ def test_days():
     now = datetime(2015, 6, 3, 0, 0)
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
+    run(pendulum.instance(since), pendulum.instance(now))
+    run(arrow.get(since), arrow.get(now))
+    run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_raises():
     since = datetime(2016, 6, 1, 0, 0)
     now = datetime(2015, 6, 3, 0, 0)
     assert_raises(ValueError, pycron.has_been, '* * * * *', since, now)
+    assert_raises(ValueError, pycron.has_been, '* * * * *', pendulum.instance(since), pendulum.instance(now))
+    assert_raises(ValueError, pycron.has_been, '* * * * *', arrow.get(since), arrow.get(now))
+    assert_raises(ValueError, pycron.has_been, '* * * * *', udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
+    assert_raises(ValueError, pycron.has_been, '* * * * *', Delorean(datetime=since, timezone='UTC').datetime, Delorean(datetime=now, timezone='UTC').datetime)
 
 
 def test_timezone():
