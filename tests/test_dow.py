@@ -3,6 +3,7 @@ import pycron
 from pytz import utc
 import pendulum
 import arrow
+import udatetime
 
 
 def test_dow():
@@ -24,6 +25,7 @@ def test_dow():
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
     run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))
 
 
 def test_day_matching():
@@ -44,3 +46,4 @@ def test_day_matching():
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
     run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))

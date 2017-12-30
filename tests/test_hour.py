@@ -3,6 +3,7 @@ import pycron
 from pytz import utc
 import pendulum
 import arrow
+import udatetime
 
 
 def test_hour():
@@ -27,3 +28,4 @@ def test_hour():
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
     run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))

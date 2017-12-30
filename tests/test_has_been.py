@@ -4,6 +4,7 @@ from pytz import utc
 import pycron
 import pendulum
 import arrow
+import udatetime
 
 
 def test_minutes():
@@ -21,6 +22,7 @@ def test_minutes():
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
     run(pendulum.instance(since), pendulum.instance(now))
     run(arrow.get(since), arrow.get(now))
+    run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
 
 
 def test_hours():
@@ -38,6 +40,7 @@ def test_hours():
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
     run(pendulum.instance(since), pendulum.instance(now))
     run(arrow.get(since), arrow.get(now))
+    run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
 
 
 def test_days():
@@ -55,6 +58,7 @@ def test_days():
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
     run(pendulum.instance(since), pendulum.instance(now))
     run(arrow.get(since), arrow.get(now))
+    run(udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
 
 
 def test_raises():
@@ -63,6 +67,7 @@ def test_raises():
     assert_raises(ValueError, pycron.has_been, '* * * * *', since, now)
     assert_raises(ValueError, pycron.has_been, '* * * * *', pendulum.instance(since), pendulum.instance(now))
     assert_raises(ValueError, pycron.has_been, '* * * * *', arrow.get(since), arrow.get(now))
+    assert_raises(ValueError, pycron.has_been, '* * * * *', udatetime.from_string(since.isoformat()), udatetime.from_string(now.isoformat()))
 
 
 def test_timezone():
