@@ -78,7 +78,7 @@ def has_been(s, since, dt=None):
     @output: boolean of result
     '''
     if dt is None:
-        dt = datetime.now()
+        dt = datetime.now(tz=since.tzinfo)
 
     if dt < since:
         raise ValueError("The since datetime must be before the current datetime.")
