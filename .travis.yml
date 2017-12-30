@@ -8,6 +8,7 @@ python:
   - "3.5"
   - "pypy"
 install:
+  - pip install -r test-requirements.txt
   - pip install -e .
 script:
   - nosetests
