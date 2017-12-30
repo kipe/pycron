@@ -1,4 +1,6 @@
-# pycron [![Build Status](https://travis-ci.org/kipe/pycron.svg?branch=master)](https://travis-ci.org/kipe/pycron)
+# pycron
+[![Build Status](https://travis-ci.org/kipe/pycron.svg?branch=master)](https://travis-ci.org/kipe/pycron)
+[![Coverage Status](https://coveralls.io/repos/github/kipe/pycron/badge.svg?branch=master)](https://coveralls.io/github/kipe/pycron?branch=master)
 Simple cron-like parser for Python, which determines if current datetime matches conditions.
 
 ## Installation
