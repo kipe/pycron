@@ -3,6 +3,7 @@ from nose.tools import assert_raises
 from pytz import utc
 import pycron
 import pendulum
+import arrow
 
 
 def test_minutes():
@@ -19,6 +20,7 @@ def test_minutes():
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
     run(pendulum.instance(since), pendulum.instance(now))
+    run(arrow.get(since), arrow.get(now))
 
 
 def test_hours():
@@ -35,6 +37,7 @@ def test_hours():
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
     run(pendulum.instance(since), pendulum.instance(now))
+    run(arrow.get(since), arrow.get(now))
 
 
 def test_days():
@@ -51,6 +54,7 @@ def test_days():
     run(since, now)
     run(since.replace(tzinfo=utc), now.replace(tzinfo=utc))
     run(pendulum.instance(since), pendulum.instance(now))
+    run(arrow.get(since), arrow.get(now))
 
 
 def test_raises():
@@ -58,6 +62,7 @@ def test_raises():
     now = datetime(2015, 6, 3, 0, 0)
     assert_raises(ValueError, pycron.has_been, '* * * * *', since, now)
     assert_raises(ValueError, pycron.has_been, '* * * * *', pendulum.instance(since), pendulum.instance(now))
+    assert_raises(ValueError, pycron.has_been, '* * * * *', arrow.get(since), arrow.get(now))
 
 
 def test_timezone():

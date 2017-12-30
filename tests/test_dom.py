@@ -2,6 +2,7 @@ from datetime import datetime
 import pycron
 from pytz import utc
 import pendulum
+import arrow
 
 
 def test_dom():
@@ -21,3 +22,4 @@ def test_dom():
     run(now)
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
+    run(arrow.get(now))

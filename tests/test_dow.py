@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import pycron
 from pytz import utc
 import pendulum
+import arrow
 
 
 def test_dow():
@@ -22,6 +23,7 @@ def test_dow():
     run(now)
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
+    run(arrow.get(now))
 
 
 def test_day_matching():
@@ -41,3 +43,4 @@ def test_day_matching():
     run(now)
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
+    run(arrow.get(now))

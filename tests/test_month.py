@@ -2,6 +2,7 @@ from datetime import datetime
 import pycron
 from pytz import utc
 import pendulum
+import arrow
 
 
 def test_parser():
@@ -21,3 +22,4 @@ def test_parser():
     run(now)
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
+    run(arrow.get(now))
