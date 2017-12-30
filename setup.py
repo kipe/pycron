@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pycron',
-    version='0.40',
+    version='0.80.0',
     description='Simple cron-like parser, which determines if current datetime matches conditions.',
     author='Kimmo Huoman',
     author_email='kipenroskaposti@gmail.com',
