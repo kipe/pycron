@@ -9,5 +9,7 @@ install:
   - pip install -r test-requirements.txt
   - pip install -e .
 script:
-  - nosetests
+  - nosetests -q --with-coverage --cover-package=pycron
 sudo: false
+after_success:
+  - coveralls
