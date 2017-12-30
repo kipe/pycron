@@ -19,9 +19,14 @@ The formats currently supported are
 - `*` (for wildcard),
 - and of course a single number.
 
-The module includes only one function, `is_now(s, dt=None)`, where `s` is the cron-style string
+The module includes `is_now(s, dt=None)`, where `s` is the cron-style string
 and `dt` is the datetime to use (defaults to current datetime, if not set).
 The function returns `True`, if `dt` matches the format.
+
+It also includes `has_been(s, since, dt=None)`, where `s` is the cron-style string, 
+`since` is a datetime in the past and `dt` is the datetime to use (defaults to current datetime, if not set).
+The function returns `True`, if `dt` would have matched the format at some point during the period. 
+This behaves much like like [anacron](https://en.wikipedia.org/wiki/Anacron) and is useful for applications which do not run continuously.
 
 There are couple of helpers available, mainly for use with Django.
 They give out list of tuples, as required by Django field choices.
