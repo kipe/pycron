@@ -64,6 +64,9 @@ def _parse_arg(value, target, allow_daynames=False):
             # If target value is in the range, it matches
             if target in range(start, end + 1):
                 return True
+            # Special cases, where the day names are more or less incorrectly set...
+            if allow_daynames and start > end:
+                return target in range(start, end + 6 + 1)
 
     return False
 

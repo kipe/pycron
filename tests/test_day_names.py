@@ -28,6 +28,17 @@ def test_day_names():
         assert pycron.is_now('* * * * sunday-thursday', now)
         assert pycron.is_now('* * * * fri-sat', now) is False
         assert pycron.is_now('* * * * friday-saturday', now) is False
+        # Special cases, where the day names are more or less incorrectly set...
+        assert pycron.is_now('* * * * thu-sun', now)
+        assert pycron.is_now('* * * * thursday-sunday', now)
+        assert pycron.is_now('* * * * wed-sun', now)
+        assert pycron.is_now('* * * * wednesday-sunday', now)
+        assert pycron.is_now('* * * * wed-mon', now)
+        assert pycron.is_now('* * * * wednesday-monday', now)
+        assert pycron.is_now('* * * * fri-sun', now) is False
+        assert pycron.is_now('* * * * friday-sunday', now) is False
+        assert pycron.is_now('* * * * fri-wed', now) is False
+        assert pycron.is_now('* * * * friday-wednesday', now) is False
 
     now = datetime(2015, 6, 18, 16, 7)
     run(now)
