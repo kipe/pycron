@@ -1,16 +1,34 @@
 from datetime import datetime, timedelta
 import calendar
 
-
+DAY_NAMES = [x.lower() for x in calendar.day_name[6:] + calendar.day_name[:6]]
+DAY_ABBRS = [x.lower() for x in calendar.day_abbr[6:] + calendar.day_abbr[:6]]
 # Choice tuples, mainly designed to use with Django
 MINUTE_CHOICES = [(str(x), str(x)) for x in range(0, 60)]
 HOUR_CHOICES = [(str(x), str(x)) for x in range(0, 24)]
 DOM_CHOICES = [(str(x), str(x)) for x in range(1, 32)]
 MONTH_CHOICES = [(str(x), calendar.month_name[x]) for x in range(1, 13)]
-DOW_CHOICES = [('0', calendar.day_name[6])] + [(str(x + 1), calendar.day_name[x]) for x in range(0, 6)]
+DOW_CHOICES = [(str(i), day_name) for i, day_name in enumerate(DAY_NAMES)]
 
 
-def _parse_arg(value, target):
+def _to_int(value, allow_daynames=False):
+    try:
+        return int(value)
+    except ValueError:
+        if not allow_daynames:
+            raise
+
+    for i, day_name in enumerate(DAY_NAMES):
+        if day_name == value:
+            return i
+    for i, day_abbr in enumerate(DAY_ABBRS):
+        if day_abbr == value:
+            return i
+
+    raise ValueError('Failed to parse string to integer')
+
+
+def _parse_arg(value, target, allow_daynames=False):
     value = value.strip()
 
     if value == '*':
@@ -21,7 +39,7 @@ def _parse_arg(value, target):
     for value in values:
         try:
             # First, try a direct comparison
-            if int(value) == target:
+            if _to_int(value, allow_daynames=allow_daynames) == target:
                 return True
         except ValueError:
             pass
@@ -32,12 +50,15 @@ def _parse_arg(value, target):
             if v != '*':
                 continue
             # If the remainder is zero, this matches
-            if target % int(interval) == 0:
+            if target % _to_int(interval, allow_daynames=allow_daynames) == 0:
                 return True
 
         if '-' in value:
             try:
-                start, end = [int(x.strip()) for x in value.split('-')]
+                start, end = [
+                    _to_int(x.strip(), allow_daynames=allow_daynames)
+                    for x in value.split('-')
+                ]
             except ValueError:
                 continue
             # If target value is in the range, it matches
@@ -64,7 +85,7 @@ def is_now(s, dt=None):
         and _parse_arg(hour, dt.hour) \
         and _parse_arg(dom, dt.day) \
         and _parse_arg(month, dt.month) \
-        and _parse_arg(dow, 0 if weekday == 7 else weekday)
+        and _parse_arg(dow, 0 if weekday == 7 else weekday, True)
 
 
 def has_been(s, since, dt=None):

@@ -1,0 +1,64 @@
+from datetime import datetime, timedelta
+import pycron
+from pytz import utc
+import pendulum
+import arrow
+import udatetime
+from delorean import Delorean
+
+
+def test_day_names():
+    def run(now):
+        assert pycron.is_now('* * * * *', now)
+        assert pycron.is_now('* * * * thu', now)
+        assert pycron.is_now('* * * * thursday', now)
+        assert pycron.is_now('* * * * */thu', now)
+        assert pycron.is_now('* * * * */thursday', now)
+        assert pycron.is_now('* * * * sun,wed,thu', now)
+        assert pycron.is_now('* * * * sunday,wednesday,thursday', now)
+        assert pycron.is_now('* * * * wed', now) is False
+        assert pycron.is_now('* * * * wednesday', now) is False
+        assert pycron.is_now('* * * * */wed', now) is False
+        assert pycron.is_now('* * * * */wednesday', now) is False
+        assert pycron.is_now('* * * * sun,wed,sat', now) is False
+        assert pycron.is_now('* * * * sunday,wednesday,saturday', now) is False
+        assert pycron.DOW_CHOICES[now.isoweekday()][1] == 'thursday'
+        assert pycron.DOW_CHOICES[0][1] == 'sunday'
+        assert pycron.is_now('* * * * sun-thu', now)
+        assert pycron.is_now('* * * * sunday-thursday', now)
+        assert pycron.is_now('* * * * fri-sat', now) is False
+        assert pycron.is_now('* * * * friday-saturday', now) is False
+
+    now = datetime(2015, 6, 18, 16, 7)
+    run(now)
+    run(now.replace(tzinfo=utc))
+    run(pendulum.instance(now))
+    run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=now, timezone='UTC').datetime)
+
+
+# def test_day_matching():
+#     def run(now):
+#         for i in range(0, 7):
+#             # Test day matching from Sunday onwards...
+#             now += timedelta(days=1)
+#             assert pycron.is_now('* * * * %i' % (i), now)
+#             # Test weekdays
+#             assert pycron.is_now('* * * * 1,2,3,4,5',
+#                                  now) is (True if i not in [0, 6] else False)
+#             assert pycron.is_now(
+#                 '* * * * 1-5', now) is (True if i not in [0, 6] else False)
+#             assert pycron.is_now('* * * * 1,2,3,4-5',
+#                                  now) is (True if i not in [0, 6] else False)
+#             # Test weekends
+#             assert pycron.is_now(
+#                 '* * * * 0,6', now) is (True if i in [0, 6] else False)
+
+#     now = datetime(2015, 6, 20, 16, 7)
+#     run(now)
+#     run(now.replace(tzinfo=utc))
+#     run(pendulum.instance(now))
+#     run(arrow.get(now))
+#     run(udatetime.from_string(now.isoformat()))
+#     run(Delorean(datetime=now, timezone='UTC').datetime)

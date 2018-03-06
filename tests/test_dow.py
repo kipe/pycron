@@ -16,8 +16,8 @@ def test_dow():
         assert pycron.is_now('* * * * 3', now) is False
         assert pycron.is_now('* * * * */3', now) is False
         assert pycron.is_now('* * * * 0,3,6', now) is False
-        assert pycron.DOW_CHOICES[now.isoweekday()][1] == 'Thursday'
-        assert pycron.DOW_CHOICES[0][1] == 'Sunday'
+        assert pycron.DOW_CHOICES[now.isoweekday()][1] == 'thursday'
+        assert pycron.DOW_CHOICES[0][1] == 'sunday'
         assert pycron.is_now('* * * * 0-4', now)
         assert pycron.is_now('* * * * 5-6', now) is False
 
