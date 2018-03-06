@@ -49,27 +49,36 @@ def test_day_names():
     run(Delorean(datetime=now, timezone='UTC').datetime)
 
 
-# def test_day_matching():
-#     def run(now):
-#         for i in range(0, 7):
-#             # Test day matching from Sunday onwards...
-#             now += timedelta(days=1)
-#             assert pycron.is_now('* * * * %i' % (i), now)
-#             # Test weekdays
-#             assert pycron.is_now('* * * * 1,2,3,4,5',
-#                                  now) is (True if i not in [0, 6] else False)
-#             assert pycron.is_now(
-#                 '* * * * 1-5', now) is (True if i not in [0, 6] else False)
-#             assert pycron.is_now('* * * * 1,2,3,4-5',
-#                                  now) is (True if i not in [0, 6] else False)
-#             # Test weekends
-#             assert pycron.is_now(
-#                 '* * * * 0,6', now) is (True if i in [0, 6] else False)
+def test_day_matching():
+    def run(now):
+        for i in range(0, 7):
+            # Test day matching from Sunday onwards...
+            now += timedelta(days=1)
+            assert pycron.is_now('* * * * %s' % (pycron.DAY_NAMES[i]), now)
+            assert pycron.is_now('* * * * %s' % (pycron.DAY_ABBRS[i]), now)
+            # Test weekdays
+            assert pycron.is_now('* * * * mon,tue,wed,thu,fri',
+                                 now) is (True if i not in [0, 6] else False)
+            assert pycron.is_now('* * * * monday,tuesday,wednesday,thursday,friday',
+                                 now) is (True if i not in [0, 6] else False)
+            assert pycron.is_now(
+                '* * * * mon-fri', now) is (True if i not in [0, 6] else False)
+            assert pycron.is_now(
+                '* * * * monday-friday', now) is (True if i not in [0, 6] else False)
+            assert pycron.is_now('* * * * mon,tue,wed,thu-fri',
+                                 now) is (True if i not in [0, 6] else False)
+            assert pycron.is_now('* * * * monday,tuesday,wednesday,thursday-friday',
+                                 now) is (True if i not in [0, 6] else False)
+            # Test weekends
+            assert pycron.is_now(
+                '* * * * sun,sat', now) is (True if i in [0, 6] else False)
+            assert pycron.is_now(
+                '* * * * sunday,saturday', now) is (True if i in [0, 6] else False)
 
-#     now = datetime(2015, 6, 20, 16, 7)
-#     run(now)
-#     run(now.replace(tzinfo=utc))
-#     run(pendulum.instance(now))
-#     run(arrow.get(now))
-#     run(udatetime.from_string(now.isoformat()))
-#     run(Delorean(datetime=now, timezone='UTC').datetime)
+    now = datetime(2015, 6, 20, 16, 7)
+    run(now)
+    run(now.replace(tzinfo=utc))
+    run(pendulum.instance(now))
+    run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=now, timezone='UTC').datetime)
