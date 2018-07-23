@@ -28,7 +28,27 @@ def test_minute():
         assert pycron.is_now('9,5-8 * * * *', now)
         assert pycron.is_now('10,20-30 * * * *', now) is False
 
+        # Issue 14
+        assert pycron.is_now('1-59/2 * * * *', now) is True
+
     now = datetime(2015, 6, 18, 0, 9)
+    run(now)
+    run(now.replace(tzinfo=utc))
+    run(pendulum.instance(now))
+    run(arrow.get(now))
+    run(udatetime.from_string(now.isoformat()))
+    run(Delorean(datetime=now, timezone='UTC').datetime)
+
+
+def test_last_minute():
+    def run(now):
+        assert pycron.is_now('* * * * *', now)
+        assert pycron.is_now('59 * * * *', now)
+        assert pycron.is_now('*/1 * * * *', now)
+        # Issue 14
+        assert pycron.is_now('1-59/2 * * * *', now) is True
+
+    now = datetime(2015, 6, 18, 0, 59)
     run(now)
     run(now.replace(tzinfo=utc))
     run(pendulum.instance(now))
