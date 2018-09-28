@@ -30,6 +30,8 @@ def test_minute():
 
         # Issue 14
         assert pycron.is_now('1-59/2 * * * *', now) is True
+        assert pycron.is_now('1-59/4 * * * *', now) is True
+        assert pycron.is_now('1-59/8 * * * *', now) is True
 
     now = datetime(2015, 6, 18, 0, 9)
     run(now)
