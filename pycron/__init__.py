@@ -44,6 +44,39 @@ def _parse_arg(value, target, allow_daynames=False):
         except ValueError:
             pass
 
+        if '-' in value:
+            step = 1
+            if '/' in value:
+                # Allow divider in values, see issue #14
+                try:
+                    start, tmp = [
+                        x.strip()
+                        for x in value.split('-')
+                    ]
+                    start = _to_int(start)
+                    end, step = [
+                        _to_int(x.strip(), allow_daynames=allow_daynames)
+                        for x in tmp.split('/')
+                    ]
+                except ValueError:
+                    continue
+            else:
+                try:
+                    start, end = [
+                        _to_int(x.strip(), allow_daynames=allow_daynames)
+                        for x in value.split('-')
+                    ]
+                except ValueError:
+                    continue
+
+            # If target value is in the range, it matches
+            if target in range(start, end + 1, step):
+                return True
+
+            # Special cases, where the day names are more or less incorrectly set...
+            if allow_daynames and start > end:
+                return target in range(start, end + 6 + 1)
+
         if '/' in value:
             v, interval = [x.strip() for x in value.split('/')]
             # Not sure if applicable for every situation, but just to make sure...
@@ -52,21 +85,6 @@ def _parse_arg(value, target, allow_daynames=False):
             # If the remainder is zero, this matches
             if target % _to_int(interval, allow_daynames=allow_daynames) == 0:
                 return True
-
-        if '-' in value:
-            try:
-                start, end = [
-                    _to_int(x.strip(), allow_daynames=allow_daynames)
-                    for x in value.split('-')
-                ]
-            except ValueError:
-                continue
-            # If target value is in the range, it matches
-            if target in range(start, end + 1):
-                return True
-            # Special cases, where the day names are more or less incorrectly set...
-            if allow_daynames and start > end:
-                return target in range(start, end + 6 + 1)
 
     return False
 
