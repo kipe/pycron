@@ -40,6 +40,12 @@ def test_day_names():
         assert pycron.is_now('* * * * fri-wed', now) is False
         assert pycron.is_now('* * * * friday-wednesday', now) is False
 
+        # Test day matching for dividers
+        assert pycron.is_now('* * * * monday-sunday/3', now) is False
+        assert pycron.is_now('* * * * mon-sun/3', now) is False
+        assert pycron.is_now('* * * * tuesday-sunday/2', now) is False
+        assert pycron.is_now('* * * * tue-sun/2', now) is False
+
     now = datetime(2015, 6, 18, 16, 7)
     run(now)
     run(now.replace(tzinfo=utc))
