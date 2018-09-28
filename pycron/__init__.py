@@ -26,6 +26,26 @@ def _parse_arg(value, target):
         except ValueError:
             pass
 
+        if '-' in value:
+            step = 1
+            if '/' in value:
+                # Allow divider in values, see issue #14
+                try:
+                    start, tmp = [x.strip() for x in value.split('-')]
+                    start = int(start)
+                    end, step = [int(x) for x in tmp.split('/')]
+                except ValueError:
+                    continue
+            else:
+                try:
+                    start, end = [int(x.strip()) for x in value.split('-')]
+                except ValueError:
+                    continue
+
+            # If target value is in the range, it matches
+            if target in range(start, end + 1, step):
+                return True
+
         if '/' in value:
             v, interval = [x.strip() for x in value.split('/')]
             # Not sure if applicable for every situation, but just to make sure...
@@ -33,15 +53,6 @@ def _parse_arg(value, target):
                 continue
             # If the remainder is zero, this matches
             if target % int(interval) == 0:
-                return True
-
-        if '-' in value:
-            try:
-                start, end = [int(x.strip()) for x in value.split('-')]
-            except ValueError:
-                continue
-            # If target value is in the range, it matches
-            if target in range(start, end + 1):
                 return True
 
     return False
