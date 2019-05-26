@@ -8,3 +8,4 @@ venv
 *.pyc
 dist
 *.egg-info
+.vscode
