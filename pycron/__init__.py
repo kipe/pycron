@@ -12,18 +12,22 @@ DOW_CHOICES = [(str(i), day_name) for i, day_name in enumerate(DAY_NAMES)]
 
 
 def _to_int(value, allow_daynames=False):
-    try:
-        return int(value)
-    except ValueError:
-        if not allow_daynames:
-            raise
+    """
+    Converts a value to an integer. If allow_daynames is True, it will convert day of week to an integer 0 through 6.
+    @input:
+        value = value to convert to integer
+        allow_daynames = True, to allow values like Mon or Monday
+    @output: value as an integer
+    """
 
-    for i, day_name in enumerate(DAY_NAMES):
-        if day_name == value:
-            return i
-    for i, day_abbr in enumerate(DAY_ABBRS):
-        if day_abbr == value:
-            return i
+    if isinstance(value, int) or (isinstance(value, str) and value.isnumeric()):
+        return int(value)
+
+    elif isinstance(value, str) and allow_daynames and value in DAY_NAMES:
+        return DAY_NAMES.index(value)
+
+    elif isinstance(value, str) and allow_daynames and value in DAY_ABBRS:
+        return DAY_ABBRS.index(value)
 
     raise ValueError('Failed to parse string to integer')
 
