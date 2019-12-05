@@ -13,7 +13,7 @@ setup(
     packages=[
         'pycron',
     ],
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     tests_require=[
         "arrow>=0.12.0",
         "coverage>=4.4.2",
