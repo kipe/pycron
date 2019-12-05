@@ -5,7 +5,10 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "pypy"
+  - "pypy3.5-6.0.0"
+  - "pypy3.5-7.0.0"
+  - "pypy3.6-7.0.0"
+  - "pypy3.6-7.1.1"
 install:
   - pip install -r test-requirements.txt
   - pip install -e .
