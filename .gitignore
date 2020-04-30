@@ -8,3 +8,8 @@ venv
 *.pyc
 dist
 *.egg-info
+
+# added for vscode use.
+.vscode/
+# easy access local files.
+.local/

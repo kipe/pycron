@@ -41,10 +41,12 @@ def test_day_names():
         assert pycron.is_now("* * * * friday-wednesday", now) is False
 
         # Test day matching for dividers
-        assert pycron.is_now("* * * * monday-sunday/3", now) is False
-        assert pycron.is_now("* * * * mon-sun/3", now) is False
-        assert pycron.is_now("* * * * tuesday-sunday/2", now) is False
-        assert pycron.is_now("* * * * tue-sun/2", now) is False
+        # NOTE: These I think should be true. First condition should be true
+        # for days: 1, 4(1+3), 7(1+3*2)->0 --> 0, 1, 4
+        assert pycron.is_now("* * * * monday-sunday/3", now) is True
+        assert pycron.is_now("* * * * mon-sun/3", now) is True
+        assert pycron.is_now("* * * * tuesday-sunday/2", now) is True
+        assert pycron.is_now("* * * * tue-sun/2", now) is True
 
     now = datetime(2015, 6, 18, 16, 7)
     run(now)
