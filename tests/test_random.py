@@ -1,17 +1,10 @@
 import pycron
 
 
-def get_arg_result(arg, value, max_value, is_day_of_week=False):
-    conditions = pycron.CronTimeComparer.parse_argument_conditions(
-        arg, max_value=max_value, is_day_of_week=is_day_of_week
-    )
-    return pycron.CronTimeComparer.calculate_condition_result(conditions, value)
-
-
 def test_parse_arg():
-    assert get_arg_result("1/5", 0, max_value=12) is False
-    assert get_arg_result("mon-wed", 0, max_value=6, is_day_of_week=True) is False
+    assert pycron._parse_arg('1/5', 0) is False
+    assert pycron._parse_arg('asd-dsa', 0) is False
 
 
 def test_no_dt():
-    assert pycron.is_now("* * * * *")
+    assert pycron.is_now('* * * * *')
