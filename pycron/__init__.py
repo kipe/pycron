@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from enum import Enum
+from typing import List
 import calendar
 
 DAY_NAMES = [x.lower() for x in calendar.day_name[6:] + calendar.day_name[:6]]
@@ -11,110 +13,216 @@ MONTH_CHOICES = [(str(x), calendar.month_name[x]) for x in range(1, 13)]
 DOW_CHOICES = [(str(i), day_name) for i, day_name in enumerate(DAY_NAMES)]
 
 
-def _to_int(value, allow_daynames=False):
-    """
-    Converts a value to an integer. If allow_daynames is True, it will convert day of week to an integer 0 through 6.
-    @input:
-        value = value to convert to integer
-        allow_daynames = True, to allow values like Mon or Monday
-    @output: value as an integer
-    """
+class CronTimeComparerArgumentCondition:
+    def __init__(self, action, **kwargs):
+        super().__init__()
 
-    if isinstance(value, int) or (isinstance(value, str) and value.isnumeric()):
-        return int(value)
+        self.action = action
+        self.kwargs = kwargs
 
-    elif isinstance(value, str) and allow_daynames and value in DAY_NAMES:
-        return DAY_NAMES.index(value)
-
-    elif isinstance(value, str) and allow_daynames and value in DAY_ABBRS:
-        return DAY_ABBRS.index(value)
-
-    raise ValueError('Failed to parse string to integer')
+    def is_valid(self, value):
+        return self.action(value, **kwargs)
 
 
-def _parse_arg(value, target, allow_daynames=False):
-    value = value.strip()
+class CronTimeComparer:
+    def __init__(self, cron_time_string: str):
+        super().__init__()
+        self._cron_time_string = cron_time_string
+        self._conditions = None
 
-    if value == '*':
-        return True
+    @property
+    def conditions(self) -> List[List[CronTimeComparerArgumentCondition]]:
+        if self._conditions is None:
+            self._conditions = self.parse_cron_time_string(self._cron_time_string)
+        return self._conditions
 
-    values = filter(None, [x.strip() for x in value.split(',')])
+    @staticmethod
+    def to_init(value, allow_daynames=False) -> int:
+        """
+        Converts a value to an integer. If allow_daynames is True, it will convert day of week to an integer 0 through 6.
+        @input:
+            value = value to convert to integer
+            allow_daynames = True, to allow values like Mon or Monday
+        @output: value as an integer
+        """
 
-    for value in values:
+        if isinstance(value, int) or (isinstance(value, str) and value.isnumeric()):
+            return int(value)
+
+        elif isinstance(value, str) and allow_daynames and value in DAY_NAMES:
+            return DAY_NAMES.index(value)
+
+        elif isinstance(value, str) and allow_daynames and value in DAY_ABBRS:
+            return DAY_ABBRS.index(value)
+
+        raise ValueError("Failed to parse string to integer")
+
+    @staticmethod
+    def try_to_init(value, allow_daynames=False) -> int:
         try:
-            # First, try a direct comparison
-            if _to_int(value, allow_daynames=allow_daynames) == target:
-                return True
+            return CronTimeComparer.to_int(value, allow_daynames=allow_daynames)
         except ValueError:
-            pass
+            return None
 
-        if '-' in value:
-            step = 1
-            if '/' in value:
-                # Allow divider in values, see issue #14
-                try:
-                    start, tmp = [
-                        x.strip()
-                        for x in value.split('-')
-                    ]
-                    start = _to_int(start)
-                    end, step = [
-                        _to_int(x.strip(), allow_daynames=allow_daynames)
-                        for x in tmp.split('/')
-                    ]
-                except ValueError:
-                    continue
-            else:
-                try:
-                    start, end = [
-                        _to_int(x.strip(), allow_daynames=allow_daynames)
-                        for x in value.split('-')
-                    ]
-                except ValueError:
-                    continue
+    @classmethod
+    def parse_argument_parts(cls, arg: str, allow_daynames=False) -> (value, step):
+        arg = arg.strip()
+        value = None
+        step = None
+        if "/" in arg:
+            arg = arg.split("/")
+            assert len(arg) == 2, ValueError("Time step must be defined as x/y. e.g. 54/2 or */2")
 
-            # If target value is in the range, it matches
-            if target in range(start, end + 1, step):
-                return True
+            value = arg[0] if arg[0] == "*" else cls.try_to_init(arg[0])
+            step = cls.try_to_init(arg[1])
 
-            # Special cases, where the day names are more or less incorrectly set...
-            if allow_daynames and start > end:
-                return target in range(start, end + 6 + 1)
+            assert value == "*" or value is not None, ValueError(f"Could not parse '{arg}' as a value. Expected x/y")
+            assert step is not None, ValueError(f"Could not parse '{arg}' as a value. Expected x/y")
+        elif arg == "*":
+            value = arg
+        else:
+            value = cls.try_to_init(arg, allow_daynames)
+        return value, step
 
-        if '/' in value:
-            v, interval = [x.strip() for x in value.split('/')]
-            # Not sure if applicable for every situation, but just to make sure...
-            if v != '*':
+    @classmethod
+    def parse_argument_conditions(
+        cls, cron_time_arguments, allow_daynames=False
+    ) -> List[CronTimeComparerArgumentCondition]:
+        # In string form. The time arguments.
+        cron_time_arguments = cron_time_arguments.strip()
+
+        if cron_time_arguments == "*":
+            # Any value will be true.
+            return []
+
+        cron_time_arguments = cron_time_arguments.split(",")
+
+        conditions = []
+
+        for cron_time_argument in cron_time_arguments:
+            cron_time_argument = cron_time_argument.strip()
+
+            if len(cron_time_argument) == 0:
                 continue
-            # If the remainder is zero, this matches
-            if target % _to_int(interval, allow_daynames=allow_daynames) == 0:
-                return True
 
-    return False
+            # extract the argument values.
+            cron_time_argument_parts = None
+
+            # Check for a range condition
+            if "-" in cron_time_argument:
+                cron_time_argument_parts = cron_time_argument.split("-")
+                assert len(cron_time_argument_parts) == 2, ValueError(
+                    "Time range arguments must be of the form, x-x, where x=number or x=a/b"
+                )
+
+                start_value, start_step = cls.parse_argument_parts(cron_time_argument_parts[0], allow_daynames)
+                end_value, step = cls.parse_argument_parts(cron_time_argument_parts[1], allow_daynames)
+
+                assert start_step is None and start_value is not None and start_value != "*", ValueError(
+                    "In a time range (x-x) the start value must be a single number (no / and no '*')"
+                )
+                assert end_value != "*"
+
+                condition = None
+                if step != None:
+                    condition = CronTimeComparerArgumentCondition(
+                        lambda value, start_value, end_value, step: value in range(start_value, end_value + 1, step),
+                        start_value=start_value,
+                        end_value=end_value,
+                        step=step,
+                    )
+                else:
+                    condition = CronTimeComparerArgumentCondition(
+                        lambda value, start_value, end_value: value >= start_value and value <= end_value,
+                        start_value=start_value,
+                        end_value=end_value,
+                    )
+                conditions.append(condition)
+            else:
+                expected, step = cls.parse_argument_parts(cron_time_argument, allow_daynames)
+                condition = None
+                if step != None:
+                    if expected == "*":
+                        condition = CronTimeComparerArgumentCondition(lambda value, step: value % step == 0, step=step,)
+                    else:
+                        condition = CronTimeComparerArgumentCondition(
+                            lambda value, expected, step: value >= expected and value % step == 0,
+                            expected=expected,
+                            step=step,
+                        )
+                else:
+                    condition = CronTimeComparerArgumentCondition(
+                        lambda value, expected: value == expected, expected=expected,
+                    )
+
+        return conditions
+
+    @classmethod
+    def parse_cron_time_string(cls, cron_time_string: str) -> List[List[CronTimeComparerArgumentCondition]]:
+        cron_time_string_args = list(filter(lambda v: len(v) > 0, cron_time_string.split(" ")))
+
+        # args by order:
+        # minute hour day_of_month month day_of_week
+        # --
+        # minute - 0 to 59, or *
+        # hour - 0 to 23, or *
+        # day_of_month - 1 to 31, or *
+        # month - 1 to 12, or *
+        # day_of_week - 0 to 7 (0 and 7 both represent Sunday), or * (no specific value)
+
+        # autocomplete.
+        while len(cron_time_string_args) < 5:
+            cron_time_string_args.append("*")
+
+        assert len(cron_time_string_args) <= 5, ValueError(
+            f"Too many arguments in cron time string: {cron_time_string}"
+        )
+
+        condition_sets = [
+            cls.parse_argument_conditions(cron_time_string_args[0]),
+            cls.parse_argument_conditions(cron_time_string_args[1]),
+            cls.parse_argument_conditions(cron_time_string_args[2]),
+            cls.parse_argument_conditions(cron_time_string_args[3]),
+            cls.parse_argument_conditions(cron_time_string_args[4], allow_daynames=True),
+        ]
+
+        return condition_sets
+
+    def compare_condition_to_value(self, idx, value):
+        arg_conditions = self.conditions[idx]
+        if len(arg_conditions) == 0:
+            return True
+        for cond in arg_conditions:
+            if cond.is_valid(value):
+                return True
+        return False
+
+    def is_in_range_or_equals(self, dt: datetime):
+        weekday = dt.isoweekday()
+        weekday = 0 if weekday == 7 else weekday
+        return (
+            self.compare_condition_to_value(0, dt.minute)
+            and self.compare_condition_to_value(1, dt.hour)
+            and self.compare_condition_to_value(2, dt.day)
+            and self.compare_condition_to_value(3, dt.month)
+            and self.compare_condition_to_value(4, weekday)
+        )
 
 
 def is_now(s, dt=None):
-    '''
+    """
     A very simple cron-like parser to determine, if (cron-like) string is valid for this date and time.
     @input:
         s = cron-like string (minute, hour, day of month, month, day of week)
         dt = datetime to use as reference time, defaults to now
     @output: boolean of result
-    '''
-    if dt is None:
-        dt = datetime.now()
-    minute, hour, dom, month, dow = s.split(' ')
-    weekday = dt.isoweekday()
-
-    return _parse_arg(minute, dt.minute) \
-        and _parse_arg(hour, dt.hour) \
-        and _parse_arg(dom, dt.day) \
-        and _parse_arg(month, dt.month) \
-        and _parse_arg(dow, 0 if weekday == 7 else weekday, True)
+    """
+    comp = CronTimeComparer(s)
+    return comp.is_in_range_or_equals(dt)
 
 
 def has_been(s, since, dt=None):
-    '''
+    """
     A parser to check whether a (cron-like) string has been true during a certain time period.
     Useful for applications which cannot check every minute or need to catch up during a restart.
     @input:
@@ -122,7 +230,7 @@ def has_been(s, since, dt=None):
         since = datetime to use as reference time for start of period
         dt = datetime to use as reference time for end of period, defaults to now
     @output: boolean of result
-    '''
+    """
     if dt is None:
         dt = datetime.now(tz=since.tzinfo)
 
