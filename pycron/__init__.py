@@ -93,7 +93,7 @@ class CronTimeComparer:
 
         if cron_time_arguments == "*":
             # Any value will be true.
-            return []
+            return None
 
         cron_time_arguments = cron_time_arguments.split(",")
 
@@ -166,6 +166,10 @@ class CronTimeComparer:
 
                 conditions.append(condition)
 
+        if len(conditions) == 0:
+            # always true.
+            return None
+
         return conditions
 
     @classmethod
@@ -201,7 +205,7 @@ class CronTimeComparer:
 
     @classmethod
     def calculate_condition_result(cls, arg_conditions, value):
-        if len(arg_conditions) == 0:
+        if arg_conditions is None or len(arg_conditions) == 0:
             return True
         for cond in arg_conditions:
             if cond.is_valid(value):
