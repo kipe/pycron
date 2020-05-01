@@ -13,6 +13,20 @@ MONTH_CHOICES = [(str(x), calendar.month_name[x]) for x in range(1, 13)]
 DOW_CHOICES = [(str(i), day_name) for i, day_name in enumerate(DAY_NAMES)]
 
 
+def condition_in_range(value, accepted_values: set):
+    return value in accepted_values
+
+
+def condition_equals(value, expected):
+    return value == expected
+
+
+def condition_interval(value, expected, step):
+    if expected is not None and value < expected:
+        return False
+    return value % step == 0
+
+
 class CronTimeComparerArgumentCondition:
     def __init__(self, action, **kwargs):
         super().__init__()
@@ -143,26 +157,16 @@ class CronTimeComparer:
                     accepted_values = range(start_value, end_value + 1, step)
 
                 accepted_values = set(accepted_values)
-                condition = CronTimeComparerArgumentCondition(
-                    lambda value, accepted_values: value in accepted_values, accepted_values=accepted_values,
-                )
+                condition = CronTimeComparerArgumentCondition(condition_in_range, accepted_values=accepted_values,)
                 conditions.append(condition)
             else:
                 expected, step = cls.parse_argument_parts(cron_time_argument, is_day_of_week)
                 condition = None
                 if step != None:
-                    if expected == "*":
-                        condition = CronTimeComparerArgumentCondition(lambda value, step: value % step == 0, step=step,)
-                    else:
-                        condition = CronTimeComparerArgumentCondition(
-                            lambda value, expected, step: value >= expected and value % step == 0,
-                            expected=expected,
-                            step=step,
-                        )
+                    expected = expected if expected != "*" else None
+                    condition = CronTimeComparerArgumentCondition(condition_interval, expected=expected, step=step)
                 else:
-                    condition = CronTimeComparerArgumentCondition(
-                        lambda value, expected: value == expected, expected=expected,
-                    )
+                    condition = CronTimeComparerArgumentCondition(condition_equals, expected=expected)
 
                 conditions.append(condition)
 
@@ -203,22 +207,30 @@ class CronTimeComparer:
 
         return condition_sets
 
-    @classmethod
-    def calculate_condition_result(cls, arg_conditions, value):
+    def calculate_condition_result(self, arg_conditions, value):
         if arg_conditions is None or len(arg_conditions) == 0:
             return True
-        for cond in arg_conditions:
-            if cond.is_valid(value):
-                return True
+
+        if arg_conditions[0].is_valid(value):
+            return True
+        # if arg_conditions[1].is_valid(value):
+        #     return True
+        # for cond in arg_conditions:
+        #     if cond.is_valid(value):
+        #         return True
         return False
 
     def compare_condition_to_value(self, idx, value):
         arg_conditions = self.conditions[idx]
-        return self.calculate_condition_result(arg_conditions, value)
+        if arg_conditions is None or arg_conditions[0].is_valid(value):
+            return True
+        return False
+        # return self.calculate_condition_result(arg_conditions, value)
 
     def is_in_range_or_equals(self, dt: datetime):
         weekday = dt.isoweekday()
         weekday = 0 if weekday == 7 else weekday
+
         return (
             self.compare_condition_to_value(0, dt.minute)
             and self.compare_condition_to_value(1, dt.hour)
