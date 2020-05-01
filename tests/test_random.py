@@ -5,7 +5,10 @@ def get_arg_result(arg, value, max_value, is_day_of_week=False):
     conditions = pycron.CronTimeComparer.parse_argument_conditions(
         arg, max_value=max_value, is_day_of_week=is_day_of_week
     )
-    return pycron.CronTimeComparer.calculate_condition_result(conditions, value)
+    for cond in conditions:
+        if cond.is_valid(value):
+            return True
+    return False
 
 
 def test_parse_arg():

@@ -13,21 +13,24 @@ MONTH_CHOICES = [(str(x), calendar.month_name[x]) for x in range(1, 13)]
 DOW_CHOICES = [(str(i), day_name) for i, day_name in enumerate(DAY_NAMES)]
 
 
-def condition_in_range(value, accepted_values: set):
+def _condition_in_range(value, accepted_values: set):
     return value in accepted_values
 
 
-def condition_equals(value, expected):
+def _condition_equals(value, expected):
     return value == expected
 
 
-def condition_interval(value, expected, step):
+def _condition_interval(value, expected, step):
     if expected is not None and value < expected:
         return False
     return value % step == 0
 
 
-class CronTimeComparerArgumentCondition:
+class CronTimeComparerArgumentCondition(object):
+    action = None
+    kwargs = None
+
     def __init__(self, action, **kwargs):
         super().__init__()
 
@@ -42,13 +45,39 @@ class CronTimeComparer:
     def __init__(self, cron_time_string: str):
         super().__init__()
         self._cron_time_string = cron_time_string
-        self._conditions = None
+        self._conditions = self.parse_cron_time_string(self._cron_time_string)
+        compiled, lambda_exp = self.compile_conditions(self._conditions)
+        self._invoke_conditions_compiled = compiled
+        self._invoke_conditions_compiled_exp = lambda_exp
 
     @property
     def conditions(self) -> List[List[CronTimeComparerArgumentCondition]]:
-        if self._conditions is None:
-            self._conditions = self.parse_cron_time_string(self._cron_time_string)
         return self._conditions
+
+    @staticmethod
+    def compile_conditions(conditions: List[List[CronTimeComparerArgumentCondition]]):
+        str_arr = []
+        arg_idx = 0
+        for arg_condition in conditions:
+            if arg_condition is None or len(arg_condition) == 0:
+                arg_idx += 1
+                continue
+            cond_str_arr = []
+            arg_condition_idx = 0
+            for arg_condition_part in arg_condition:
+                cond_str_arr.append(f"conditions[{arg_idx}][{arg_condition_idx}].is_valid(v_{arg_idx})")
+                arg_condition_idx += 1
+            str_arr.append("(" + " or ".join(cond_str_arr) + ")")
+            arg_idx += 1
+
+        if len(str_arr) == 0:
+            return True, None
+
+        condition_string = " and ".join(str_arr)
+        arg_names = map(lambda idx: f"v_{idx}", range(0, len(conditions)))
+        lambda_exp = "lambda conditions, " + ",".join(arg_names) + ": " + condition_string
+        lambda_method = eval(lambda_exp)
+        return lambda_method, lambda_exp
 
     @staticmethod
     def to_int(value, is_day_of_week=False) -> int:
@@ -111,7 +140,7 @@ class CronTimeComparer:
 
         cron_time_arguments = cron_time_arguments.split(",")
 
-        conditions = []
+        arg_conditions = list()
 
         for cron_time_argument in cron_time_arguments:
             cron_time_argument = cron_time_argument.strip()
@@ -152,29 +181,28 @@ class CronTimeComparer:
                     # move forward one.
                     end_value += max_value + 1
                     accepted_values += range(start_value, end_value + 1, step)
-                    accepted_values = [v % (max_value + 1) for v in accepted_values]
                 else:
                     accepted_values = range(start_value, end_value + 1, step)
 
-                accepted_values = set(accepted_values)
-                condition = CronTimeComparerArgumentCondition(condition_in_range, accepted_values=accepted_values,)
-                conditions.append(condition)
+                accepted_values = set([v % (max_value + 1) for v in accepted_values])
+                condition = CronTimeComparerArgumentCondition(_condition_in_range, accepted_values=accepted_values,)
+                arg_conditions.append(condition)
             else:
                 expected, step = cls.parse_argument_parts(cron_time_argument, is_day_of_week)
                 condition = None
                 if step != None:
                     expected = expected if expected != "*" else None
-                    condition = CronTimeComparerArgumentCondition(condition_interval, expected=expected, step=step)
+                    condition = CronTimeComparerArgumentCondition(_condition_interval, expected=expected, step=step)
                 else:
-                    condition = CronTimeComparerArgumentCondition(condition_equals, expected=expected)
+                    condition = CronTimeComparerArgumentCondition(_condition_equals, expected=expected)
 
-                conditions.append(condition)
+                arg_conditions.append(condition)
 
-        if len(conditions) == 0:
+        if len(arg_conditions) == 0:
             # always true.
             return None
 
-        return conditions
+        return arg_conditions
 
     @classmethod
     def parse_cron_time_string(cls, cron_time_string: str) -> List[List[CronTimeComparerArgumentCondition]]:
@@ -207,33 +235,15 @@ class CronTimeComparer:
 
         return condition_sets
 
-    def calculate_condition_result(self, arg_conditions, value):
-        if arg_conditions is None or len(arg_conditions) == 0:
-            return True
-
-        for cond in arg_conditions:
-            if cond.is_valid(value):
-                return True
-        return False
-
-    def compare_condition_to_value(self, idx, value):
-        arg_conditions = self.conditions[idx]
-        if arg_conditions is None or arg_conditions[0].is_valid(value):
-            return True
-        return False
-        # return self.calculate_condition_result(arg_conditions, value)
-
     def is_in_range_or_equals(self, dt: datetime):
         weekday = dt.isoweekday()
-        weekday = 0 if weekday == 7 else weekday
+        if weekday == 7:
+            weekday = 0
 
-        return (
-            self.compare_condition_to_value(0, dt.minute)
-            and self.compare_condition_to_value(1, dt.hour)
-            and self.compare_condition_to_value(2, dt.day)
-            and self.compare_condition_to_value(3, dt.month)
-            and self.compare_condition_to_value(4, weekday)
-        )
+        if self._invoke_conditions_compiled is True:
+            return True
+
+        return self._invoke_conditions_compiled(self._conditions, dt.minute, dt.hour, dt.day, dt.month, weekday)
 
 
 def is_now(s, dt=None):
