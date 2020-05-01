@@ -211,13 +211,9 @@ class CronTimeComparer:
         if arg_conditions is None or len(arg_conditions) == 0:
             return True
 
-        if arg_conditions[0].is_valid(value):
-            return True
-        # if arg_conditions[1].is_valid(value):
-        #     return True
-        # for cond in arg_conditions:
-        #     if cond.is_valid(value):
-        #         return True
+        for cond in arg_conditions:
+            if cond.is_valid(value):
+                return True
         return False
 
     def compare_condition_to_value(self, idx, value):
