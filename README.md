@@ -1,5 +1,5 @@
 # pycron
-[![Build Status](https://travis-ci.org/kipe/pycron.svg?branch=master)](https://travis-ci.org/kipe/pycron)
+![Test Status](https://github.com/kipe/pycron/workflows/Test/badge.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/kipe/pycron/badge.svg?branch=master)](https://coveralls.io/github/kipe/pycron?branch=master)
 
 Simple cron-like parser for Python, which determines if current datetime matches conditions.
