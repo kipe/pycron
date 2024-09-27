@@ -117,15 +117,25 @@ def is_now(s, dt=None):
     """
     if dt is None:
         dt = datetime.now()
-    minute, hour, dom, month, dow = s.split(" ")
+    minute, hour, dom, month, dow = [x.strip() for x in s.split(" ")]
     weekday = dt.isoweekday()
+
+    # Special case if both of the 'day' -fields are set -> allow either one to match
+    # See: https://github.com/kipe/pycron/issues/29
+    if "*" not in dom and "*" not in dow:
+        day_rule = _parse_arg(dom, dt.day) or _parse_arg(
+            dow, 0 if weekday == 7 else weekday, True
+        )
+    else:
+        day_rule = _parse_arg(dom, dt.day) and _parse_arg(
+            dow, 0 if weekday == 7 else weekday, True
+        )
 
     return (
         _parse_arg(minute, dt.minute)
         and _parse_arg(hour, dt.hour)
-        and _parse_arg(dom, dt.day)
         and _parse_arg(month, dt.month)
-        and _parse_arg(dow, 0 if weekday == 7 else weekday, True)
+        and day_rule
     )
 
 
