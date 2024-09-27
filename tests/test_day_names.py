@@ -48,6 +48,19 @@ class DayNamesTestCase(unittest.TestCase):
             assert pycron.is_now("* * * * tuesday-sunday/2", now) is False
             assert pycron.is_now("* * * * tue-sun/2", now) is False
 
+            # Test capitalised names
+            assert pycron.is_now("* * * * THU", now)
+            assert pycron.is_now("* * * * THURSDAY", now)
+            assert pycron.is_now("* * * * */THU", now)
+            assert pycron.is_now("* * * * */THURSDAY", now)
+            assert pycron.is_now("* * * * SUN,WED,THU", now)
+            assert pycron.is_now("* * * * SUNDAY,WEDNESDAY,THURSDAY", now)
+            assert pycron.is_now("* * * * WED", now) is False
+            assert pycron.is_now("* * * * WEDNESDAY", now) is False
+            assert pycron.is_now("* * * * */WED", now) is False
+            assert pycron.is_now("* * * * */WEDNESDAY", now) is False
+            assert pycron.is_now("* * * * SUN,WED,SAT", now) is False
+
         now = datetime(2015, 6, 18, 16, 7)
         run(now)
         run(now.replace(tzinfo=utc))
