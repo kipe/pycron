@@ -8,3 +8,5 @@ venv
 *.pyc
 dist
 *.egg-info
+.python-version
+.coverage

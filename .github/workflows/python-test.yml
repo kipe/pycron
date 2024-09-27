@@ -5,9 +5,9 @@ name: Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   test:
@@ -15,45 +15,42 @@ jobs:
     strategy:
       matrix:
         python-version:
-        - '3.5'
-        - '3.6'
-        - '3.7'
-        - '3.8'
-        # udatetime doesn't compile with 3.9
-        # - '3.9'
-        - 'pypy-3.6'
-        - 'pypy-3.7'
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "pypy-3.9"
+          - "pypy-3.10"
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r test-requirements.txt
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 pycron --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings
-        flake8 pycron --count --exit-zero --max-complexity=20 --max-line-length=120 --statistics
-    - name: Test with nose
-      run: |
-        nosetests -q --with-coverage --cover-package=pycron
-    - name: Coveralls
-      uses: AndreMiras/coveralls-python-action@develop
-      with:
-        parallel: true
-        flag-name: run-${{ matrix.test_number }}
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install --with test
+      - name: Lint
+        run: |
+          poetry run flake8 pycron --max-line-length=88
+          poetry run pylint pycron
+      - name: Run tests
+        run: |
+          poetry run coverage run -m unittest discover -b
+      - name: Coveralls
+        uses: AndreMiras/coveralls-python-action@develop
+        with:
+          parallel: true
+          flag-name: run-${{ matrix.test_number }}
 
   finish:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
-      uses: AndreMiras/coveralls-python-action@develop
-      with:
-        parallel-finished: true
+      - name: Coveralls Finished
+        uses: AndreMiras/coveralls-python-action@develop
+        with:
+          parallel-finished: true

@@ -1,13 +1,16 @@
 # pycron
-![Test Status](https://github.com/kipe/pycron/workflows/Test/badge.svg?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/kipe/pycron/badge.svg?branch=master)](https://coveralls.io/github/kipe/pycron?branch=master)
+
+![Test Status](https://github.com/kipe/pycron/workflows/python-test.yml/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/kipe/pycron/badge.svg?branch=main)](https://coveralls.io/github/kipe/pycron?branch=main)
 
 Simple cron-like parser for Python, which determines if current datetime matches conditions.
 
 ## Installation
+
 `pip install pycron`
 
 ## Usage
+
 ```python
 import pycron
 pycron.is_now('*/5 * * * *')  # True every 5 minutes
@@ -15,7 +18,9 @@ pycron.is_now('0 * * * *')    # True every hour, on minute 0
 ```
 
 ## Help
+
 The formats currently supported are
+
 - `*/5` (for "every X" function),
 - `4-10` (for time ranges),
 - `6,8,23` (for a list of values),
@@ -37,22 +42,24 @@ There are couple of helpers available, mainly for use with Django.
 They give out list of tuples, as required by Django field choices.
 
 The available helpers are
+
 - `pycron.MINUTE_CHOICES`,
 - `pycron.HOUR_CHOICES`,
 - `pycron.DOM_CHOICES`, for day of month
 - `pycron.MONTH_CHOICES`, for month names
 - `pycron.DOW_CHOICES`, for day names
 
-
 ## Support for alternative datetime -libraries
+
 Currently supported "alternative" datetime libraries are:
+
 - [Arrow](http://arrow.readthedocs.io/en/latest/)
 - [Delorean](http://delorean.readthedocs.io/en/latest/)
 - [Pendulum](https://pendulum.eustace.io/)
 - [udatetime](https://github.com/freach/udatetime)
 
-
 #### Notes
+
 This was done, as I personally needed something like this to implement proper timers for my Django-project and
 every available library felt too complicated for my use-case. Also, this was a good coding exercise...
 
