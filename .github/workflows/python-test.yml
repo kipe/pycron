@@ -33,9 +33,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install --with test
-      - name: Lint with flake8
+      - name: Lint
         run: |
           poetry run flake8 pycron --max-line-length=88
+          poetry run pylint pycron
       - name: Run tests
         run: |
           poetry run coverage run -m unittest discover -b

@@ -1,3 +1,5 @@
+"""Simple cron-like parser, which determines if current datetime matches conditions."""
+
 from datetime import datetime, timedelta
 import calendar
 
@@ -25,16 +27,27 @@ def _to_int(value, allow_daynames=False):
     if isinstance(value, int) or (isinstance(value, str) and value.isnumeric()):
         return int(value)
 
-    elif isinstance(value, str) and allow_daynames and value in DAY_NAMES:
+    if isinstance(value, str) and allow_daynames and value in DAY_NAMES:
         return DAY_NAMES.index(value)
 
-    elif isinstance(value, str) and allow_daynames and value in DAY_ABBRS:
+    if isinstance(value, str) and allow_daynames and value in DAY_ABBRS:
         return DAY_ABBRS.index(value)
 
     raise ValueError("Failed to parse string to integer")
 
 
 def _parse_arg(value, target, allow_daynames=False):
+    """
+    Parses a given value and checks if it matches the provided target.
+    Allowing day names is optional, but can be useful for certain situations.
+
+    @input:
+        value = value to parse and check
+        target = target value to compare with
+        allow_daynames = True, to allow values like Mon or Monday
+    @output: True if the value matches the target, False otherwise
+    """
+    # pylint: disable=too-many-branches
     value = value.strip()
 
     if value == "*":
@@ -42,20 +55,20 @@ def _parse_arg(value, target, allow_daynames=False):
 
     values = filter(None, [x.strip() for x in value.split(",")])
 
-    for value in values:
+    for _value in values:
         try:
             # First, try a direct comparison
-            if _to_int(value, allow_daynames=allow_daynames) == target:
+            if _to_int(_value, allow_daynames=allow_daynames) == target:
                 return True
         except ValueError:
             pass
 
-        if "-" in value:
+        if "-" in _value:
             step = 1
-            if "/" in value:
+            if "/" in _value:
                 # Allow divider in values, see issue #14
                 try:
-                    start, tmp = [x.strip() for x in value.split("-")]
+                    start, tmp = [x.strip() for x in _value.split("-")]
                     start = _to_int(start)
                     end, step = [
                         _to_int(x.strip(), allow_daynames=allow_daynames)
@@ -67,7 +80,7 @@ def _parse_arg(value, target, allow_daynames=False):
                 try:
                     start, end = [
                         _to_int(x.strip(), allow_daynames=allow_daynames)
-                        for x in value.split("-")
+                        for x in _value.split("-")
                     ]
                 except ValueError:
                     continue
@@ -80,8 +93,8 @@ def _parse_arg(value, target, allow_daynames=False):
             if allow_daynames and start > end:
                 return target in range(start, end + 6 + 1)
 
-        if "/" in value:
-            v, interval = [x.strip() for x in value.split("/")]
+        if "/" in _value:
+            v, interval = [x.strip() for x in _value.split("/")]
             # Not sure if applicable for every situation, but just to make sure...
             if v != "*":
                 continue
