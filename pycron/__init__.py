@@ -27,11 +27,11 @@ def _to_int(value, allow_daynames=False):
     if isinstance(value, int) or (isinstance(value, str) and value.isnumeric()):
         return int(value)
 
-    if isinstance(value, str) and allow_daynames and value in DAY_NAMES:
-        return DAY_NAMES.index(value)
+    if isinstance(value, str) and allow_daynames and value.lower() in DAY_NAMES:
+        return DAY_NAMES.index(value.lower())
 
-    if isinstance(value, str) and allow_daynames and value in DAY_ABBRS:
-        return DAY_ABBRS.index(value)
+    if isinstance(value, str) and allow_daynames and value.lower() in DAY_ABBRS:
+        return DAY_ABBRS.index(value.lower())
 
     raise ValueError("Failed to parse string to integer")
 
