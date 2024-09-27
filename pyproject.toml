@@ -1,10 +1,13 @@
 [tool.poetry]
 name = "pycron"
-version = "3.1.0"
+version = "3.1.1"
 description = "Simple cron-like parser, which determines if current datetime matches conditions."
-authors = ["Kimmo Huoman <kipenroskaposti@gmail.com>"]
+authors = ["Kimmo Huoman <kipenroskaposti+pycron@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/kipe/pycron"
+repository = "https://github.com/kipe/pycron"
+keywords = ["cron", "parser"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
