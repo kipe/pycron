@@ -16,6 +16,21 @@ pycron.is_now('*/5 * * * *')  # True every 5 minutes
 pycron.is_now('0 * * * *')    # True every hour, on minute 0
 ```
 
+```python
+from pycron import get_last_match,get_next_match
+
+cron_string = "30 14 * * 1"  # Every Monday at 14:30
+timezone = "America/New_York"
+
+last_match = get_last_match(cron_string, timezone)
+next_match = get_next_match(cron_string, timezone)
+
+print("Last match:", last_match)
+print("Next match:", next_match)
+```
+
+
+
 ## Help
 
 The formats currently supported are

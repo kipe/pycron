@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 import calendar
+import pytz
 
 DAY_NAMES = [x.lower() for x in calendar.day_name[6:] + calendar.day_name[:6]]
 DAY_ABBRS = [x.lower() for x in calendar.day_abbr[6:] + calendar.day_abbr[:6]]
@@ -164,3 +165,43 @@ def has_been(s, since, dt=None):
         since += timedelta(minutes=1)
 
     return False
+
+
+def get_last_match(s,timezone="America/New_York",minutes_limit=60*24*60):
+    """
+    A way to get last runtime date
+
+    @input:
+        s             = cron-like string (minute, hour, day of month, month, day of week)
+        timezone      = used timezone #default "America/New_York"
+        minutes_limit = Maximum number of minutes to look back to prevent infinit loop #default 60days
+    @output: datetime.datetime or None when minutes_limit exeeds
+    """
+
+    dt = datetime.now(tz=pytz.timezone(timezone))
+
+    while minutes_limit:
+        if is_now(s, dt):
+            return dt.replace(second=0, microsecond=0)
+        dt -= timedelta(minutes=1)
+        minutes_limit -=1
+    return None
+
+def get_next_match(s, timezone="America/New_York", minutes_limit=60*24*60):
+    """
+    A way to get next runtime date.
+
+    @input:
+        s             = cron-like string (minute, hour, day of month, month, day of week)
+        timezone      = used timezone #default "America/New_York"
+        minutes_limit = Maximum number of minutes to look back to prevent infinite loop #default 60 days
+    @output: datetime.datetime or None when minutes_limit exceeds
+    """
+    dt = datetime.now(tz=pytz.timezone(timezone))
+
+    while minutes_limit:
+        if is_now(s, dt):
+            return dt.replace(second=0, microsecond=0)
+        dt += timedelta(minutes=1)
+        minutes_limit -= 1
+    return None
