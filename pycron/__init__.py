@@ -2,9 +2,10 @@
 
 from datetime import datetime, timedelta
 import calendar
+from typing import Any, Optional
 
-DAY_NAMES = [x.lower() for x in calendar.day_name[6:] + calendar.day_name[:6]]
-DAY_ABBRS = [x.lower() for x in calendar.day_abbr[6:] + calendar.day_abbr[:6]]
+DAY_NAMES = [x.lower() for x in [*calendar.day_name[6:], *calendar.day_name[:6]]]
+DAY_ABBRS = [x.lower() for x in [*calendar.day_abbr[6:], *calendar.day_abbr[:6]]]
 # Choice tuples, mainly designed to use with Django
 MINUTE_CHOICES = [(str(x), str(x)) for x in range(0, 60)]
 HOUR_CHOICES = [(str(x), str(x)) for x in range(0, 24)]
@@ -13,7 +14,7 @@ MONTH_CHOICES = [(str(x), calendar.month_name[x]) for x in range(1, 13)]
 DOW_CHOICES = [(str(i), day_name) for i, day_name in enumerate(DAY_NAMES)]
 
 
-def _to_int(value, allow_daynames=False):
+def _to_int(value: Any, allow_daynames: bool = False) -> int:
     """
     Converts a value to an integer.
     If allow_daynames is True, it will convert day of week to an integer 0 through 6.
@@ -36,7 +37,7 @@ def _to_int(value, allow_daynames=False):
     raise ValueError("Failed to parse string to integer")
 
 
-def _parse_arg(value, target, allow_daynames=False):
+def _parse_arg(value: str, target: int, allow_daynames: bool = False) -> bool:
     """
     Parses a given value and checks if it matches the provided target.
     Allowing day names is optional, but can be useful for certain situations.
@@ -69,7 +70,7 @@ def _parse_arg(value, target, allow_daynames=False):
                 # Allow divider in values, see issue #14
                 try:
                     start, tmp = [x.strip() for x in _value.split("-")]
-                    start = _to_int(start)
+                    start_int = _to_int(start)
                     end, step = [
                         _to_int(x.strip(), allow_daynames=allow_daynames)
                         for x in tmp.split("/")
@@ -78,7 +79,7 @@ def _parse_arg(value, target, allow_daynames=False):
                     continue
             else:
                 try:
-                    start, end = [
+                    start_int, end = [
                         _to_int(x.strip(), allow_daynames=allow_daynames)
                         for x in _value.split("-")
                     ]
@@ -86,12 +87,12 @@ def _parse_arg(value, target, allow_daynames=False):
                     continue
 
             # If target value is in the range, it matches
-            if target in range(start, end + 1, step):
+            if target in range(start_int, end + 1, step):
                 return True
 
             # Special cases, where the day names are more or less incorrectly set...
-            if allow_daynames and start > end:
-                return target in range(start, end + 6 + 1)
+            if allow_daynames and start_int > end:
+                return target in range(start_int, end + 6 + 1)
 
         if "/" in _value:
             v, interval = [x.strip() for x in _value.split("/")]
@@ -105,7 +106,7 @@ def _parse_arg(value, target, allow_daynames=False):
     return False
 
 
-def is_now(s, dt=None):
+def is_now(s: str, dt: Optional[datetime] = None) -> bool:
     """
     A very simple cron-like parser to determine, if (cron-like) string is valid
     for this date and time.
@@ -139,7 +140,7 @@ def is_now(s, dt=None):
     )
 
 
-def has_been(s, since, dt=None):
+def has_been(s: str, since: datetime, dt: Optional[datetime] = None) -> bool:
     """
     A parser to check whether a (cron-like) string has been true
     during a certain time period.
