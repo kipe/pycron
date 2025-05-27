@@ -38,6 +38,7 @@ jobs:
         run: |
           poetry run flake8 pycron --max-line-length=88
           poetry run pylint pycron
+          poetry run mypy pycron
       - name: Run tests
         run: |
           poetry run coverage run -m unittest discover -b
