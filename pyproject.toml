@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycron"
-version = "3.1.2"
+version = "3.2.0"
 description = "Simple cron-like parser, which determines if current datetime matches conditions."
 authors = ["Kimmo Huoman <kipenroskaposti+pycron@gmail.com>"]
 license = "MIT"
