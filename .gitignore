@@ -10,3 +10,4 @@ dist
 *.egg-info
 .python-version
 .coverage
+.mypy_cache
