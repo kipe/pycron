@@ -37,7 +37,9 @@ def _to_int(value: Any, allow_daynames: bool = False) -> int:
     raise ValueError("Failed to parse string to integer")
 
 
-def _parse_arg(value: str, target: int, allow_daynames: bool = False) -> bool:
+def _parse_arg(
+    value: str, target: int, allow_daynames: bool = False, min_value: int = 0
+) -> bool:
     """
     Parses a given value and checks if it matches the provided target.
     Allowing day names is optional, but can be useful for certain situations.
@@ -46,6 +48,8 @@ def _parse_arg(value: str, target: int, allow_daynames: bool = False) -> bool:
         value = value to parse and check
         target = target value to compare with
         allow_daynames = True, to allow values like Mon or Monday
+        min_value = smallest value the field accepts, used as the
+                    starting point for step values like */2
     @output: True if the value matches the target, False otherwise
     """
     # pylint: disable=too-many-branches
@@ -99,8 +103,10 @@ def _parse_arg(value: str, target: int, allow_daynames: bool = False) -> bool:
             # Not sure if applicable for every situation, but just to make sure...
             if v != "*":
                 continue
-            # If the remainder is zero, this matches
-            if target % _to_int(interval, allow_daynames=allow_daynames) == 0:
+            # Steps count from the start of the field, not from zero,
+            # so */2 on a 1-based field means 1, 3, 5... not 2, 4, 6...
+            interval_int = _to_int(interval, allow_daynames=allow_daynames)
+            if (target - min_value) % interval_int == 0:
                 return True
 
     return False
@@ -124,18 +130,18 @@ def is_now(s: str, dt: Optional[datetime] = None) -> bool:
     # Special case if both of the 'day' -fields are set -> allow either one to match
     # See: https://github.com/kipe/pycron/issues/29
     if "*" not in dom and "*" not in dow:
-        day_rule = _parse_arg(dom, dt.day) or _parse_arg(
+        day_rule = _parse_arg(dom, dt.day, min_value=1) or _parse_arg(
             dow, 0 if weekday == 7 else weekday, True
         )
     else:
-        day_rule = _parse_arg(dom, dt.day) and _parse_arg(
+        day_rule = _parse_arg(dom, dt.day, min_value=1) and _parse_arg(
             dow, 0 if weekday == 7 else weekday, True
         )
 
     return (
         _parse_arg(minute, dt.minute)
         and _parse_arg(hour, dt.hour)
-        and _parse_arg(month, dt.month)
+        and _parse_arg(month, dt.month, min_value=1)
         and day_rule
     )
 
