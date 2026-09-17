@@ -30,13 +30,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: uv sync --group test
+        run: uv sync
       - name: Lint
         run: |
-          uv run --group test flake8 pycron --max-line-length=88
-          uv run --group test pylint pycron
-          uv run --group test mypy pycron
+          uv run flake8 pycron --max-line-length=88
+          uv run pylint pycron
+          uv run mypy pycron
       - name: Run tests
         run: |
-          uv run --group test coverage run -m unittest discover -b
-          uv run --group test coverage report --fail-under=100
+          uv run coverage run -m unittest discover -b
+          uv run coverage report --fail-under=100
