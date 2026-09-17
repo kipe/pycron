@@ -22,7 +22,7 @@ dev = [
   "pytz>=2024.2",
   "udatetime>=0.0.17,<0.1",
   "pylint>=3.3.1,<4",
-  "mypy>=1.15.0,<2",
+  "mypy>=1.15.0,<2; platform_python_implementation != 'PyPy'",
 ]
 
 [build-system]
