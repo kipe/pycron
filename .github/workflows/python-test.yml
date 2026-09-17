@@ -35,7 +35,9 @@ jobs:
         run: |
           uv run flake8 pycron --max-line-length=88
           uv run pylint pycron
-          uv run mypy pycron
+      - name: Type check
+        if: ${{ !startsWith(matrix.python-version, 'pypy') }}
+        run: uv run mypy pycron
       - name: Run tests
         run: |
           uv run coverage run -m unittest discover -b
