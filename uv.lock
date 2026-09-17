@@ -798,7 +798,7 @@ name = "pycron"
 source = { editable = "." }
 
 [package.dev-dependencies]
-test = [
+dev = [
     { name = "arrow" },
     { name = "coverage", version = "7.10.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "coverage", version = "7.16.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
@@ -815,7 +815,7 @@ test = [
 [package.metadata]
 
 [package.metadata.requires-dev]
-test = [
+dev = [
     { name = "arrow", specifier = ">=1.3.0,<2" },
     { name = "coverage", specifier = ">=7.6.1,<8" },
     { name = "delorean", specifier = ">=1.0.0,<2" },
