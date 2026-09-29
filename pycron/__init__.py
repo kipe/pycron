@@ -165,6 +165,7 @@ def has_been(s: str, since: datetime, dt: Optional[datetime] = None) -> bool:
     if dt < since:
         raise ValueError("The since datetime must be before the current datetime.")
 
+    since = since.replace(second=0, microsecond=0)
     while since <= dt:
         if is_now(s, since):
             return True
